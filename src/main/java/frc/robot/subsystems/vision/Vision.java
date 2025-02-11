@@ -10,9 +10,11 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
@@ -30,22 +32,23 @@ public class Vision extends SubsystemBase {
    */
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
-    this.io = io;
+
+    this.io =
+        Arrays.stream(io).filter(i -> i.getCameraConstants() != null).toArray(VisionIO[]::new);
 
     // Initialize inputs
-    this.inputs = new VisionIOInputsAutoLogged[io.length];
-    for (int i = 0; i < inputs.length; i++) {
-      inputs[i] = new VisionIOInputsAutoLogged();
-    }
+    this.inputs = new VisionIOInputsAutoLogged[this.io.length];
+    Arrays.setAll(this.inputs, i -> new VisionIOInputsAutoLogged());
 
     // Initialize disconnected alerts
     this.disconnectedAlerts = new Alert[io.length];
-    for (int i = 0; i < inputs.length; i++) {
-      disconnectedAlerts[i] =
-          new Alert(
-              "Vision camera \"" + io[i].getCameraConstants().cameraName() + "\" is disconnected.",
-              Alert.AlertType.kWarning);
-    }
+    IntStream.range(0, inputs.length)
+        .forEach(
+            i ->
+                disconnectedAlerts[i] =
+                    new Alert(
+                        "No data from " + this.io[i].getCameraConstants().cameraName(),
+                        Alert.AlertType.kWarning));
   }
 
   /**

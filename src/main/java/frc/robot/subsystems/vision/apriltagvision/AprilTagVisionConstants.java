@@ -10,6 +10,8 @@ import java.util.function.DoubleSupplier;
 
 // TODO tune all of these!!
 public final class AprilTagVisionConstants {
+  public static final String KEY = "AprilTagVision";
+
   public static final boolean LEFT_CAM_ENABLED = true;
   public static final VisionIO.CameraConstants LEFT_CAM_CONSTANTS =
       new VisionIO.CameraConstants(
@@ -26,7 +28,7 @@ public final class AprilTagVisionConstants {
               0.3, 0.3, 0.2, new Rotation3d(0, degreesToRadians(-20), degreesToRadians(0))),
           VisionIO.CameraType.OV9281);
 
-  public static final boolean BACK_CAM_ENABLED = false;
+  public static final boolean BACK_CAM_ENABLED = true;
   public static final VisionIO.CameraConstants BACK_CAM_CONSTANTS =
       new VisionIO.CameraConstants(
           "backtagcam",
@@ -35,9 +37,9 @@ public final class AprilTagVisionConstants {
           VisionIO.CameraType.OV9281);
 
   public static final DoubleSupplier TRANSLATION_EULER_MULTIPLIER =
-      new LoggedTunableNumber("AprilTagVision/EulerMultipliers/Translation", 0.02);
+      new LoggedTunableNumber(KEY + "/EulerMultipliers/Translation", 0.02);
   public static final DoubleSupplier ROTATION_EULER_MULTIPLIER =
-      new LoggedTunableNumber("AprilTagVision/EulerMultipliers/Rotation", 0.06);
+      new LoggedTunableNumber(KEY + "/EulerMultipliers/Rotation", 0.06);
 
   public static final double MAX_AMBIGUITY_CUTOFF = 0.3;
   public static final double MAX_Z_ERROR = 0.75;
@@ -50,8 +52,10 @@ public final class AprilTagVisionConstants {
   public static final DoubleSupplier[] CAMERA_AMBIGUITY_FACTORS =
       new LoggedTunableNumber[] {
         new LoggedTunableNumber(
-            "AprilTagVision/" + LEFT_CAM_CONSTANTS.cameraName() + "CameraAmbiguityFactors", 1),
+            KEY + LEFT_CAM_CONSTANTS.cameraName() + "/CameraAmbiguityFactor", 1),
         new LoggedTunableNumber(
-            "AprilTagVision/" + RIGHT_CAM_CONSTANTS.cameraName() + "CameraAmbiguityFactors", 1)
+            KEY + RIGHT_CAM_CONSTANTS.cameraName() + "/CameraAmbiguityFactor", 1),
+        new LoggedTunableNumber(
+          KEY + BACK_CAM_CONSTANTS.cameraName() + "/CameraAmbiguityFactor", 1)
       };
 }

@@ -42,7 +42,7 @@ public interface VisionIO {
   public default void updateInputs(VisionIOInputs inputs) {}
 
   public default CameraConstants getCameraConstants() {
-    return new CameraConstants("UNKNOWN", new Transform3d(), CameraType.UNKNOWN);
+    return null;
   }
 
   /**

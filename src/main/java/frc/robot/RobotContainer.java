@@ -25,6 +25,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,11 +37,15 @@ import frc.robot.OI.OperatorMap;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.swerve.*;
+import frc.robot.subsystems.vision.AprilTagVisionIOPhotonVision;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnField;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoral;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -139,14 +144,13 @@ public class RobotContainer {
             case REAL -> new Vision(
                 drive,
                 LEFT_CAM_ENABLED
-                    ? new VisionIOPhotonVisionSim(LEFT_CAM_CONSTANTS, drive::getPose)
+                    ? new AprilTagVisionIOPhotonVision(LEFT_CAM_CONSTANTS)
                     : new VisionIO() {},
                 RIGHT_CAM_ENABLED
-                    ? new VisionIOPhotonVisionSim(RIGHT_CAM_CONSTANTS, drive::getPose)
+                    ? new AprilTagVisionIOPhotonVision(RIGHT_CAM_CONSTANTS)
                     : new VisionIO() {},
                 BACK_CAM_ENABLED
-                    ? new VisionIOPhotonVisionSim(
-                        BACK_CAM_CONSTANTS, driveSimulation::getSimulatedDriveTrainPose)
+                    ? new AprilTagVisionIOPhotonVision(BACK_CAM_CONSTANTS)
                     : new VisionIO() {});
             case SIM -> new Vision(
                 drive,
@@ -166,7 +170,14 @@ public class RobotContainer {
           };
     } else vision = null;
 
-    configureOperatorButtonBindings();
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoral(
+                // We must specify a heading since the coral is a tube
+                new Pose2d(2, 2, Rotation2d.fromDegrees(90))));
+    SimulatedArena.getInstance().addGamePiece(new ReefscapeAlgaeOnField(new Translation2d(2, 2)));
+    SimulatedArena.getInstance()
+        .addGamePiece(new ReefscapeCoralAlgaeStack(new Translation2d(2, 2)));
 
     // Configure the button bindings
     configureDriverButtonBindings();
@@ -276,8 +287,8 @@ public class RobotContainer {
     Logger.recordOutput(
         "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
     Logger.recordOutput(
-        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    Logger.recordOutput(
         "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    Logger.recordOutput(
+        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
   }
 }
