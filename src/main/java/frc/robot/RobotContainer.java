@@ -247,10 +247,7 @@ public class RobotContainer {
   }
 
   private void configureOperatorButtonBindings() {
-    operator
-        .shoot()
-        .whileFalse(superstructure.setSuperStateCmd(Superstructure.SuperStates.IDLING))
-        .whileTrue(superstructure.setSuperStateCmd(Superstructure.SuperStates.RUNNING));
+
   }
 
   /** Write all the auto named commands here */
